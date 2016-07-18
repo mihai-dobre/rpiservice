@@ -1,17 +1,16 @@
 import rpyc
+from utils import is_open, close_window, open_window
 
 class RTUService(rpyc.Service):
     def exposed_get_status(self): 
-        if window_status:
-            return 'open'
-        return 'close'
+        if is_open():
+            return True
+        return False
 
     def exposed_open_window(self):
-        return actuator_open()
+        return open_window()
         
     def exposed_close_window(self):  
-        return actuator_close()
+        return close_window()
 
-if __name__ == "__main__":
-    c = rpyc.connect(RTUService, "localhost", 18861)
-    c.root.hello()
+
