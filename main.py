@@ -1,13 +1,15 @@
 import rpyc
-import logging
+import time
+from log import log
 from rpyc_service import RTUService
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger('RTULog')
-    hdlr = logging.handlers.BaseRotatingHandler()
-    hdlr.setLevel(logging.DEBUG)
-    formater = logging.Formatter()
-    logger.addHandler(hdlr)
-    c = rpyc.connect(RTUService, "localhost", 18861)
-    c.root.hello()
+    print log
+    print dir(log)
+    try:
+        c = rpyc.connect( 'localhost', 8010, service=RTUService)
+        log.error(c.root.echo('client here'))
+    except Exception as err:
+        print err
+        log.error('Connection error: {}'.format(err))
