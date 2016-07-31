@@ -9,4 +9,5 @@ def setup_log():
     log.propagate=True
     return log
     
+print 'here'
 log = setup_log()
