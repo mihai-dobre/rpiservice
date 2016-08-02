@@ -7,7 +7,7 @@ from rpyc_service import RTUService, connect
 device_sn = '12345678abcdefgh'
 
 if __name__ == "__main__":
-    init_window()
+    #init_window()
     connected = False
     while 1:
         if not connected:

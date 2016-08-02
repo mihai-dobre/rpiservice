@@ -1,7 +1,9 @@
 import os
 import sys
 import time
-import RPi.GPIO as GPIO
+import platform
+if '{} {}'.format(platform.system(), platform.release()) != 'Linux 3.16.0-4-amd64':
+    import RPi.GPIO as GPIO
 from log import log
 
 WINDOW_OPEN_PIN = 5
