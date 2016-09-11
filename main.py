@@ -5,17 +5,18 @@ from utils import init_window
 from rpyc_service import RTUService, connect
 
 if __name__ == "__main__":
-    #init_window()
+    init_window()
     connected = False
     while 1:
+        time.sleep(1)
         if not connected:
             try:
                 c = connect()
                 connected = True
-                log.info('Connected to server: %s', c._config)
+                log.warning('Connected to server: %s', c._config['connid'])
             except Exception as err:
                 print err
-                log.error('Connection error: {}'.format(err))
+                log.warning('Connection error: {}'.format(err))
         else:
             time.sleep(1)
             try:

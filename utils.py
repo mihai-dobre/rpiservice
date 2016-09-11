@@ -16,6 +16,7 @@ WINDOW_STATUS = {False: 'Close', True: 'Open'}
 
 def init_window():
     log.info('Initializing the raspberry pi pins')
+    log.warning('Initializing the raspberry pi pins')
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(WINDOW_OPEN_PIN, GPIO.OUT)
     GPIO.setup(WINDOW_CLOSE_PIN, GPIO.OUT)
@@ -40,9 +41,10 @@ def open_window():
     @return: True or False 
     """
     global status
+    log.info('window opens')
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     GPIO.output(WINDOW_OPEN_PIN, GPIO.HIGH)
-    time.sleep(1)
+    time.sleep(4)
     status = True
     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
     return True
@@ -53,9 +55,10 @@ def close_window():
     @return: True or False
     """
     global status
+    log.info('window closes')
     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
-    time.sleep(1)
+    time.sleep(4)
     status = False
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     return True
