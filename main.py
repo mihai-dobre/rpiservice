@@ -2,7 +2,7 @@ import rpyc
 import time
 from log import log
 from utils import init_window
-from rpyc_service import RTUService, connect
+from rpyc_service import connect
 
 if __name__ == "__main__":
     init_window()
