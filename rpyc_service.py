@@ -19,8 +19,8 @@ device_sn = "test"
 connection = None
 is_busy = False
 
-REMOTE_SERVER = ""
-
+# REMOTE_SERVER = "ec2-34-245-83-52.eu-west-1.compute.amazonaws.com"
+REMOTE_SERVER  = "172.16.0.104"
 
 def init_window():
     log.info("Initializing the raspberry pi pins")
@@ -53,7 +53,7 @@ def open_window(conn):
     global status
     log.warning("window opens")
     log.info("window started to open")
-    GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
+    # GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     GPIO.output(WINDOW_OPEN_PIN, GPIO.HIGH)
     time.sleep(7)
     status = True
@@ -64,21 +64,38 @@ def open_window(conn):
     conn.root.action_finished(device_sn, "open")
 
 
+# def close_window(conn):
+#     """
+#     Closes the window.
+#     @return: True or False
+#     """
+#     global status
+#     log.warning("window started to close")
+#     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
+#     GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
+#     time.sleep(7)
+#     status = False
+#     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
+#     global is_busy
+#     is_busy = False
+#     log.info("window closed")
+#     conn.root.action_finished(device_sn, "close")
+
+
 def close_window(conn):
     """
-    Closes the window.
+    Stop watering
     @return: True or False
     """
     global status
-    log.warning("window started to close")
+    log.warning("Stop water pump")
     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
-    GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
-    time.sleep(7)
+    # GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
+    # time.sleep(7)
     status = False
-    GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
+    # GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     global is_busy
     is_busy = False
-    log.info("window closed")
     conn.root.action_finished(device_sn, "close")
 
 
@@ -118,5 +135,5 @@ class RTUService(rpyc.Service):
 
 def connect():
     global connection
-    connection = rpyc.connect("gen8.doraz.ro", 8010, service=RTUService)
+    connection = rpyc.connect(REMOTE_SERVER, 8010, service=RTUService)
     return connection
