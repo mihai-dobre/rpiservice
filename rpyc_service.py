@@ -2,7 +2,7 @@ import os
 import sys
 import time
 import rpyc
-import threading
+import _thread
 import platform
 if "{} {}".format(platform.system(), platform.release()) != "Linux 3.16.0-4-amd64":
     import RPi.GPIO as GPIO
@@ -110,7 +110,7 @@ class RTUService(rpyc.Service):
         is_busy = True
 #         log.warning("~~ is_busy: %s", is_busy)
         try:
-            threading.start_new_thread(open_window, (connection,))
+            _thread.start_new_thread(open_window, (connection,))
         except Exception as err:
             log.error("thread did not started: %s", err)
         return True
