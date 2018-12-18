@@ -2,9 +2,9 @@ import os
 import sys
 import time
 import rpyc
-import thread
+import threading
 import platform
-if '{} {}'.format(platform.system(), platform.release()) != 'Linux 3.16.0-4-amd64':
+if "{} {}".format(platform.system(), platform.release()) != "Linux 3.16.0-4-amd64":
     import RPi.GPIO as GPIO
 from log import log
 
@@ -14,14 +14,17 @@ WINDOW_STATUS_PIN = 26
 # Close = False
 # Open = True
 status = False
-WINDOW_STATUS = {False: 'Close', True: 'Open'}
-device_sn = 'test'
+WINDOW_STATUS = {False: "Close", True: "Open"}
+device_sn = "test"
 connection = None
 is_busy = False
 
+REMOTE_SERVER = ""
+
+
 def init_window():
-    log.info('Initializing the raspberry pi pins')
-    log.warning('Initializing the raspberry pi pins')
+    log.info("Initializing the raspberry pi pins")
+    log.warning("Initializing the raspberry pi pins")
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(WINDOW_OPEN_PIN, GPIO.OUT)
     GPIO.setup(WINDOW_CLOSE_PIN, GPIO.OUT)
@@ -33,6 +36,7 @@ def init_window():
 #input_value = GPIO.input(11)
 #GPIO.output(13, GPIO.LOW)
 
+
 def is_open():
     """
     Check if the window is open or closed.
@@ -40,14 +44,15 @@ def is_open():
     """
     return WINDOW_STATUS[status]
 
+
 def open_window(conn):
     """
     Opens the window.
     @return: True or False 
     """
     global status
-    log.warning('window opens')
-    print 'window started to open'
+    log.warning("window opens")
+    log.info("window started to open")
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     GPIO.output(WINDOW_OPEN_PIN, GPIO.HIGH)
     time.sleep(7)
@@ -55,8 +60,9 @@ def open_window(conn):
     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
     global is_busy
     is_busy = False
-    print 'window opened'
-    conn.root.action_finished(device_sn, 'open')
+    log.info("window opened")
+    conn.root.action_finished(device_sn, "open")
+
 
 def close_window(conn):
     """
@@ -64,8 +70,7 @@ def close_window(conn):
     @return: True or False
     """
     global status
-    log.warning('window closes')
-    print 'window started to close'
+    log.warning("window started to close")
     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
     time.sleep(7)
@@ -73,33 +78,35 @@ def close_window(conn):
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     global is_busy
     is_busy = False
-    print 'window closed'
-    conn.root.action_finished(device_sn, 'close')
+    log.info("window closed")
+    conn.root.action_finished(device_sn, "close")
+
 
 class RTUService(rpyc.Service):
-    def exposed_get_status(self): 
+
+    def exposed_get_status(self):
         return is_open()
 
     def exposed_open_window(self):
-        log.warning('open_window from server')
+        log.warning("open_window from server")
         global is_busy
         is_busy = True
-#         log.warning('~~ is_busy: %s', is_busy)
+#         log.warning("~~ is_busy: %s", is_busy)
         try:
-            thread.start_new_thread(open_window, (connection,))
+            threading.start_new_thread(open_window, (connection,))
         except Exception as err:
-            log.error('thread did not started: %s', err)
+            log.error("thread did not started: %s", err)
         return True
         
     def exposed_close_window(self):
-        log.warning('close window from server')
+        log.warning("close window from server")
         global is_busy
         is_busy = True
-#         log.warning('~~ is_busy: %s', is_busy)
+#         log.warning("~~ is_busy: %s", is_busy)
         try:
-            thread.start_new_thread(close_window, (connection,))
+            threading.start_new_thread(close_window, (connection,))
         except Exception as err:
-            log.error('thread did not started: %s', err)
+            log.error("thread did not started: %s", err)
         return True
     
     def exposed_get_uuid(self):
@@ -107,8 +114,9 @@ class RTUService(rpyc.Service):
     
     def exposed_is_busy(self):
         return is_busy
-    
+
+
 def connect():
     global connection
-    connection = rpyc.connect('gen8.doraz.ro', 8010, service=RTUService)
+    connection = rpyc.connect("gen8.doraz.ro", 8010, service=RTUService)
     return connection

@@ -2,7 +2,7 @@ import os
 import sys
 import time
 import platform
-if '{} {}'.format(platform.system(), platform.release()) != 'Linux 3.16.0-4-amd64':
+if "{} {}".format(platform.system(), platform.release()) != "Linux 3.16.0-4-amd64":
     import RPi.GPIO as GPIO
 from log import log
 
@@ -12,11 +12,11 @@ WINDOW_STATUS_PIN = 26
 # Close = False
 # Open = True
 status = False
-WINDOW_STATUS = {False: 'Close', True: 'Open'}
+WINDOW_STATUS = {False: "Close", True: "Open"}
 
 def init_window():
-    log.info('Initializing the raspberry pi pins')
-    log.warning('Initializing the raspberry pi pins')
+    log.info("Initializing the raspberry pi pins")
+    log.warning("Initializing the raspberry pi pins")
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(WINDOW_OPEN_PIN, GPIO.OUT)
     GPIO.setup(WINDOW_CLOSE_PIN, GPIO.OUT)
@@ -41,7 +41,7 @@ def open_window():
     @return: True or False 
     """
     global status
-    log.info('window opens')
+    log.info("window opens")
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
     GPIO.output(WINDOW_OPEN_PIN, GPIO.HIGH)
     time.sleep(4)
@@ -55,7 +55,7 @@ def close_window():
     @return: True or False
     """
     global status
-    log.info('window closes')
+    log.info("window closes")
     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
     GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
     time.sleep(4)
