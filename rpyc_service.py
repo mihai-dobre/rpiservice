@@ -1,127 +1,41 @@
-import os
-import sys
-import time
 import rpyc
 import _thread
-import platform
-if "{} {}".format(platform.system(), platform.release()) != "Linux 3.16.0-4-amd64":
-    import RPi.GPIO as GPIO
 from log import log
+import platform
+if platform.machine() != "x86_64":
+    from pi_utils import init_window, open_window, close_window, device_sn, is_busy
+else:
+    from laptop_utils import init_window, open_window, close_window, device_sn, is_busy
 
-WINDOW_OPEN_PIN = 5
-WINDOW_CLOSE_PIN = 6
-WINDOW_STATUS_PIN = 26
-# Close = False
-# Open = True
-status = False
-WINDOW_STATUS = {False: "Close", True: "Open"}
-device_sn = "test"
+
 connection = None
-is_busy = False
 
-# REMOTE_SERVER = "ec2-34-245-83-52.eu-west-1.compute.amazonaws.com"
-REMOTE_SERVER  = "172.16.0.104"
-
-def init_window():
-    log.info("Initializing the raspberry pi pins")
-    log.warning("Initializing the raspberry pi pins")
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(WINDOW_OPEN_PIN, GPIO.OUT)
-    GPIO.setup(WINDOW_CLOSE_PIN, GPIO.OUT)
-    GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
-    GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
-    #GPIO.setup(WINDOW_STATUS_PIN, GPIO.IN)
-
-# taking input value from Pin 11
-#input_value = GPIO.input(11)
-#GPIO.output(13, GPIO.LOW)
-
-
-def is_open():
-    """
-    Check if the window is open or closed.
-    @return: True or False
-    """
-    return WINDOW_STATUS[status]
-
-
-def open_window(conn):
-    """
-    Opens the window.
-    @return: True or False 
-    """
-    global status
-    log.warning("window opens")
-    log.info("window started to open")
-    # GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
-    GPIO.output(WINDOW_OPEN_PIN, GPIO.HIGH)
-    time.sleep(7)
-    status = True
-    GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
-    global is_busy
-    is_busy = False
-    log.info("window opened")
-    conn.root.action_finished(device_sn, "open")
-
-
-# def close_window(conn):
-#     """
-#     Closes the window.
-#     @return: True or False
-#     """
-#     global status
-#     log.warning("window started to close")
-#     GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
-#     GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
-#     time.sleep(7)
-#     status = False
-#     GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
-#     global is_busy
-#     is_busy = False
-#     log.info("window closed")
-#     conn.root.action_finished(device_sn, "close")
-
-
-def close_window(conn):
-    """
-    Stop watering
-    @return: True or False
-    """
-    global status
-    log.warning("Stop water pump")
-    GPIO.output(WINDOW_OPEN_PIN, GPIO.LOW)
-    # GPIO.output(WINDOW_CLOSE_PIN, GPIO.HIGH)
-    # time.sleep(7)
-    status = False
-    # GPIO.output(WINDOW_CLOSE_PIN, GPIO.LOW)
-    global is_busy
-    is_busy = False
-    conn.root.action_finished(device_sn, "close")
+REMOTE_SERVER = "watering.dev.qadre.io"
 
 
 class RTUService(rpyc.Service):
 
+    status = False
+
+    def on_connect(self, conn):
+        init_window()
+
     def exposed_get_status(self):
-        return is_open()
+        return "open" if self.status else "closed"
 
     def exposed_open_window(self):
         log.warning("open_window from server")
-        global is_busy
-        is_busy = True
-#         log.warning("~~ is_busy: %s", is_busy)
         try:
-            _thread.start_new_thread(open_window, (connection,))
+            t = _thread.start_new_thread(open_window, (connection,))
         except Exception as err:
             log.error("thread did not started: %s", err)
+
         return True
         
     def exposed_close_window(self):
         log.warning("close window from server")
-        global is_busy
-        is_busy = True
-#         log.warning("~~ is_busy: %s", is_busy)
         try:
-            threading.start_new_thread(close_window, (connection,))
+            t = _thread.start_new_thread(close_window, (connection,))
         except Exception as err:
             log.error("thread did not started: %s", err)
         return True
@@ -130,7 +44,7 @@ class RTUService(rpyc.Service):
         return device_sn
     
     def exposed_is_busy(self):
-        return is_busy
+        return is_busy()
 
 
 def connect():
