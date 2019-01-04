@@ -8,7 +8,7 @@ def setup_log():
     formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(message)s", datefmt="%y-%m-%d %H:%M:%S")
     hdlr.setFormatter(formatter)
     log.addHandler(hdlr)
-    log.propagate=True
+    log.setLevel(logging.INFO)
     return log
 
 
