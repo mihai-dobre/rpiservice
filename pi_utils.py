@@ -9,7 +9,7 @@ device_sn = "test"
 
 WATER_PUMP_PIN = 4
 
-WATERING_TIME = 30
+WATERING_TIME = 60
 
 
 def init_window():
