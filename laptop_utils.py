@@ -4,6 +4,7 @@ from threading import Lock
 
 lock = Lock()
 device_sn = "test"
+REMOTE_SERVER = "localhost"
 
 WATER_PUMP_PIN = 4
 

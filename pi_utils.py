@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 
 lock = Lock()
 device_sn = "test"
+REMOTE_SERVER = "watering.dev.qadre.io"
 
 WATER_PUMP_PIN = 4
 

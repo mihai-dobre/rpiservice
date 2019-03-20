@@ -13,7 +13,7 @@ if __name__ == "__main__":
                 log.info("Connected to server: %s", c._config["connid"])
             except Exception as err:
                 print("Error: ", err)
-                log.warning("Connection error: {}".format(err))
+                log.exception("Connection error!")
         else:
             time.sleep(1)
             try:

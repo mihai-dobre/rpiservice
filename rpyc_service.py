@@ -1,16 +1,15 @@
 import rpyc
+import ssl
 import _thread
 from log import log
 import platform
 if platform.machine() != "x86_64":
-    from pi_utils import init_window, open_window, close_window, device_sn, is_busy
+    from pi_utils import init_window, open_window, close_window, device_sn, is_busy, REMOTE_SERVER
 else:
-    from laptop_utils import init_window, open_window, close_window, device_sn, is_busy
+    from laptop_utils import init_window, open_window, close_window, device_sn, is_busy, REMOTE_SERVER
 
 
 connection = None
-
-REMOTE_SERVER = "watering.dev.qadre.io"
 
 
 class RTUService(rpyc.Service):
@@ -28,6 +27,7 @@ class RTUService(rpyc.Service):
         try:
             t = _thread.start_new_thread(open_window, (connection,))
         except Exception as err:
+            t.join()
             log.error("thread did not started: %s", err)
 
         return True
@@ -42,12 +42,21 @@ class RTUService(rpyc.Service):
     
     def exposed_get_uuid(self):
         return device_sn
-    
+
     def exposed_is_busy(self):
         return is_busy()
 
 
 def connect():
     global connection
-    connection = rpyc.connect(REMOTE_SERVER, 8010, service=RTUService)
+    connection = rpyc.ssl_connect(
+        REMOTE_SERVER,
+        8010,
+        service=RTUService,
+        keepalive=True,
+        keyfile='/home/mihaido/ssl_certs/client.key',
+        certfile='/home/mihaido/ssl_certs/client.cert',
+        ca_certs='/home/mihaido/ssl_certs/ca.cert',
+        # ssl_version=ssl.OPENSSL_VERSION_NUMBER,
+    )
     return connection
