@@ -1,7 +1,7 @@
 import time
+import RPi.GPIO as GPIO
 from log import log
 from threading import Lock
-import RPi.GPIO as GPIO
 
 
 lock = Lock()
