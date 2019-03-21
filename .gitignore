@@ -254,3 +254,6 @@ config
 description
 hooks
 info
+
+# ssl certificates
+ssl/
