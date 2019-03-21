@@ -12,5 +12,5 @@ if pgrep -x "python3.6" > /dev/null
 then
     echo "Running"
 else
-    /usr/local/bin/python3.6 /home/pi/rpiservice/main.py
+    /usr/bin/python3.4 /home/pi/rpiservice/main.py
 fi
