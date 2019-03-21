@@ -1,5 +1,5 @@
+import os
 import rpyc
-import ssl
 import _thread
 from log import log
 import platform
@@ -49,14 +49,15 @@ class RTUService(rpyc.Service):
 
 def connect():
     global connection
+    project_path = '/home/mihaido/Projects/rpiservice/ssl'
     connection = rpyc.ssl_connect(
         REMOTE_SERVER,
         8010,
         service=RTUService,
         keepalive=True,
-        keyfile='/home/mihaido/ssl_certs/client.key',
-        certfile='/home/mihaido/ssl_certs/client.cert',
-        ca_certs='/home/mihaido/ssl_certs/ca.cert',
+        keyfile=os.path.join(project_path, 'keys', 'rpi_q_office.key.pem'),
+        certfile=os.path.join(project_path, 'certs', 'rpi_q_office.cert.pem'),
+        ca_certs=os.path.join(project_path, 'certs', 'ca-chain.cert.pem'),
         # ssl_version=ssl.OPENSSL_VERSION_NUMBER,
     )
     return connection
