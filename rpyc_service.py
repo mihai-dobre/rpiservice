@@ -1,6 +1,8 @@
 import os
+import ssl
 import rpyc
-import _thread
+from rpyc.utils.factory import ssl_connect
+from threading import Thread
 from log import log
 import platform
 if platform.machine() != "x86_64":
@@ -25,7 +27,8 @@ class RTUService(rpyc.Service):
     def exposed_open_window(self):
         log.warning("open_window from server")
         try:
-            t = _thread.start_new_thread(open_window, (connection,))
+            t = Thread(name='Watering', target=open_window, args=(connection,))
+            t.start()
         except Exception as err:
             t.join()
             log.error("thread did not started: %s", err)
@@ -35,7 +38,8 @@ class RTUService(rpyc.Service):
     def exposed_close_window(self):
         log.warning("close window from server")
         try:
-            t = _thread.start_new_thread(close_window, (connection,))
+            t = Thread(name='StopWatering', target=close_window, args=(connection,))
+            t.start()
         except Exception as err:
             log.error("thread did not started: %s", err)
         return True
@@ -50,14 +54,13 @@ class RTUService(rpyc.Service):
 def connect():
     global connection
     project_path = '/home/mihaido/Projects/rpiservice/ssl'
-    connection = rpyc.ssl_connect(
+    # connection = rpyc.connect(REMOTE_SERVER, 18821, RTUService)
+    connection = ssl_connect(
         REMOTE_SERVER,
-        8010,
+        port=18821,
         service=RTUService,
-        keepalive=True,
         keyfile=os.path.join(project_path, 'keys', 'rpi_q_office.key.pem'),
         certfile=os.path.join(project_path, 'certs', 'rpi_q_office.cert.pem'),
-        ca_certs=os.path.join(project_path, 'certs', 'ca-chain.cert.pem'),
-        # ssl_version=ssl.OPENSSL_VERSION_NUMBER,
+        ssl_version=ssl.PROTOCOL_SSLv23,
     )
     return connection
