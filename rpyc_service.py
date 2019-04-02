@@ -31,7 +31,7 @@ class RTUService(rpyc.Service):
             t.start()
         except Exception as err:
             t.join()
-            log.error("thread did not started: %s", err)
+            log.exception("thread did not started")
 
         return True
         
@@ -41,6 +41,7 @@ class RTUService(rpyc.Service):
             t = Thread(name='StopWatering', target=close_window, args=(connection,))
             t.start()
         except Exception as err:
+            t.join()
             log.error("thread did not started: %s", err)
         return True
     
@@ -53,14 +54,15 @@ class RTUService(rpyc.Service):
 
 def connect():
     global connection
-    project_path = '/home/mihaido/Projects/rpiservice/ssl'
-    # connection = rpyc.connect(REMOTE_SERVER, 18821, RTUService)
+    project_path = '/home/pi/rpiservice/ssl'
     connection = ssl_connect(
         REMOTE_SERVER,
         port=18821,
         service=RTUService,
+        keepalive=True,
         keyfile=os.path.join(project_path, 'keys', 'rpi_q_office.key.pem'),
         certfile=os.path.join(project_path, 'certs', 'rpi_q_office.cert.pem'),
-        ssl_version=ssl.PROTOCOL_SSLv23,
+        ca_certs=os.path.join(project_path, 'certs', 'ca-chain.cert.pem'),
+        ssl_version=ssl.PROTOCOL_SSLv23
     )
     return connection
