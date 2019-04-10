@@ -10,7 +10,7 @@ REMOTE_SERVER = "watering.dev.qadre.io"
 
 WATER_PUMP_PIN = 4
 
-WATERING_TIME = 60
+WATERING_TIME = 30
 
 
 def init_window():

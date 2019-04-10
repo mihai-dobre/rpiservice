@@ -8,7 +8,7 @@
 # */1 * * * * /bin/bash /home/pi/rpiservice/start_rpiservice.sh >> /var/log/rpiservice.log 2>&1
 # do not forget to create the /var/log/rpiservice.log file
 
-if pgrep -x "python3.6" > /dev/null
+if pgrep -x "python3.4" > /dev/null
 then
     echo "Running"
 else
