@@ -5,6 +5,7 @@ from threading import Lock
 lock = Lock()
 device_sn = "test"
 REMOTE_SERVER = "localhost"
+REMOTE_SERVER = "watering.dev.qadre.io"
 
 WATER_PUMP_PIN = 4
 
@@ -12,7 +13,7 @@ WATERING_TIME = 30
 
 
 def init_window():
-    log.info("Initializing the raspberry pi pins")
+    log.info("Laptop/PC, not RPi")
 
 
 def is_busy():

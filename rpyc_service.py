@@ -1,7 +1,8 @@
 import os
 import ssl
 import rpyc
-import _thread
+from rpyc.utils.factory import ssl_connect
+from threading import Thread
 from log import log
 import platform
 if platform.machine() != "x86_64":
@@ -26,18 +27,21 @@ class RTUService(rpyc.Service):
     def exposed_open_window(self):
         log.warning("open_window from server")
         try:
-            t = _thread.start_new_thread(open_window, (connection,))
+            t = Thread(name='Watering', target=open_window, args=(connection,))
+            t.start()
         except Exception as err:
             t.join()
-            log.error("thread did not started: %s", err)
+            log.exception("thread did not started")
 
         return True
         
     def exposed_close_window(self):
         log.warning("close window from server")
         try:
-            t = _thread.start_new_thread(close_window, (connection,))
+            t = Thread(name='StopWatering', target=close_window, args=(connection,))
+            t.start()
         except Exception as err:
+            t.join()
             log.error("thread did not started: %s", err)
         return True
     
@@ -51,9 +55,9 @@ class RTUService(rpyc.Service):
 def connect():
     global connection
     project_path = '/home/pi/rpiservice/ssl'
-    connection = rpyc.ssl_connect(
+    connection = ssl_connect(
         REMOTE_SERVER,
-        18821,
+        port=18821,
         service=RTUService,
         keepalive=True,
         keyfile=os.path.join(project_path, 'keys', 'rpi_q_office.key.pem'),
