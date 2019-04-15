@@ -6,9 +6,9 @@ from threading import Thread
 from log import log
 import platform
 if platform.machine() != "x86_64":
-    from pi_utils import init_window, open_window, close_window, device_sn, is_busy, REMOTE_SERVER
+    from pi_utils import init_window, open_window, close_window, device_sn, is_busy, REMOTE_SERVER, SSL_PATH
 else:
-    from laptop_utils import init_window, open_window, close_window, device_sn, is_busy, REMOTE_SERVER
+    from laptop_utils import init_window, open_window, close_window, device_sn, is_busy, REMOTE_SERVER, SSL_PATH
 
 
 connection = None
@@ -54,15 +54,14 @@ class RTUService(rpyc.Service):
 
 def connect():
     global connection
-    project_path = '/home/pi/rpiservice/ssl'
     connection = ssl_connect(
         REMOTE_SERVER,
         port=18821,
         service=RTUService,
         keepalive=True,
-        keyfile=os.path.join(project_path, 'keys', 'rpi_q_office.key.pem'),
-        certfile=os.path.join(project_path, 'certs', 'rpi_q_office.cert.pem'),
-        ca_certs=os.path.join(project_path, 'certs', 'ca-chain.cert.pem'),
+        keyfile=os.path.join(SSL_PATH, 'keys', 'rpi_q_office.key.pem'),
+        certfile=os.path.join(SSL_PATH, 'certs', 'rpi_q_office.cert.pem'),
+        ca_certs=os.path.join(SSL_PATH, 'certs', 'ca-chain.cert.pem'),
         ssl_version=ssl.PROTOCOL_SSLv23
     )
     return connection

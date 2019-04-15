@@ -12,6 +12,8 @@ WATER_PUMP_PIN = 4
 
 WATERING_TIME = 60
 
+SSL_PATH = "/home/pi/rpiservice/ssl"
+
 
 def init_window():
     log.info("Initializing the raspberry pi pins")

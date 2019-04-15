@@ -3,7 +3,7 @@ from log import log
 from threading import Lock
 
 lock = Lock()
-device_sn = "test"
+device_sn = "test_localhost"
 REMOTE_SERVER = "localhost"
 REMOTE_SERVER = "watering.dev.qadre.io"
 
@@ -11,6 +11,7 @@ WATER_PUMP_PIN = 4
 
 WATERING_TIME = 30
 
+SSL_PATH = "/home/mihaido/Projects/rpiservice/ssl"
 
 def init_window():
     log.info("Laptop/PC, not RPi")
